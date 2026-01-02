@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard – Barangay Paknaan Health Center</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+      (function(){
+          emailjs.init("woy9PXJtsDYmHNawg"); 
+      })();
+    </script>
+</head>
+<body>
+  <div id="adminContent" class="admin-content">
+    <header class="header">
+      <div class="header-content">
+        <div class="hospital-info">
+          <h1 class="hospital-name">
+            <i class="fas fa-clinic-medical"></i> Paknaan Health Center
+          </h1>
+          <p class="subtitle">Administrator Dashboard – Patient Records Management</p>
+        </div>
+        
+        <div class="admin-info">
+          <div class="admin-avatar" id="adminInitial">A</div>
+          <div class="admin-details">
+            <h3 class="admin-name" id="adminName">Administrator</h3>
+            <p class="admin-role">Health Center Management</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="dashboard-grid">
+  
+        <aside class="sidebar">
+        
+          <section class="stats-card">
+            <h3 class="stats-heading">
+              <i class="fas fa-users"></i> Patient Statistics
+            </h3>
+            <div class="stats-number" id="totalPatients">0</div>
+            <p class="stats-subtitle">Total Pending Appointments</p>
+            <div class="stats-details">
+              <div class="approved-stats">
+                <label>Approved:</label>
+                <span class="value" id="approvedCount">0</span>
+              </div>
+              <div class="pending-stats">
+                <label>Pending:</label>
+                <span class="value" id="pendingCount">0</span>
+              </div>
+              <div class="new-today-stats">
+                <label></label>
+                <span class="value" id="newTodayCount" style="color: var(--danger); font-weight: bold;"></span>
+              </div>
+            </div>
+          </section>
+
+          <section class="quick-actions">
+            <h3 class="actions-heading">
+              <i class="fas fa-bolt"></i> Quick Actions
+            </h3>
+            <div class="action-buttons">
+              <button class="action-btn" onclick="viewAllApprovedAppointments()">
+                <i class="fas fa-list-check"></i>
+                View All Approved Appointments
+              </button>
+              
+              <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Log Out
+              </button>
+            </div>
+          </section>
+        </aside>
+
+        <section class="main-content">
+          <header class="content-header">
+            <h2 class="requests-heading">
+              <i class="fas fa-user-injured"></i> Patient Appointment Requests
+            </h2>
+            <div class="search-filter">
+              <input type="text" class="search-box" id="searchInput" placeholder="Search patients..."/>
+            </div>
+          </header>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Patient Name</th>
+                  <th>Email</th>
+                  <th>Age</th>
+                  <th>Contact</th>
+                  <th>Address</th>
+                  <th>Service</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableBody">
+          
+              </tbody>
+            </table>
+          </div>
+
+          <aside class="note" style="margin-top: 25px; padding: 20px; background-color: rgba(26, 115, 232, 0.05); border-radius: 8px; border-left: 4px solid var(--primary);">
+            <i class="fas fa-info-circle note-icon"></i>
+            <p class="note-text">
+              <strong>Note:</strong> New appointments appear at the top of the list. Look for the "NEW" badge to identify recent submissions. Click "Set Schedule" to approve an appointment and assign a schedule. Click "View" to see complete patient details.
+            </p>
+          </aside>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p class="copyright">© 2023 Barangay Paknaan Health Center. All rights reserved.</p>
+      <p class="version-info" style="margin-top: 10px; font-size: 13px;">Administrator Dashboard v1.0 • Last updated: <span id="currentDate"></span></p>
+    </footer>
+
+    <div class="modals">
+    
+      <div class="modal" id="patientModal">
+        <div class="modal-content">
+          <header class="modal-header">
+            <h3 class="modal-title">
+              <i class="fas fa-user-circle"></i> Patient Details
+            </h3>
+            <button class="close-modal" id="closePatientModal">×</button>
+          </header>
+          <div class="modal-body" id="patientModalContent">
+           
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="modal" id="scheduleModal">
+        <div class="modal-content">
+          <header class="modal-header">
+            <h3 class="modal-title">
+              <i class="fas fa-calendar-check"></i> Set Appointment Schedule
+            </h3>
+            <button class="close-modal" id="closeScheduleModal">×</button>
+          </header>
+          <div class="modal-body" id="scheduleModalContent">
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; color: var(--primary); font-weight: 500;">Select Date</label>
+              <input type="date" class="search-box" id="scheduleDate" style="width: 100%;"/>
+            </div>
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; color: var(--primary); font-weight: 500;">Select Time</label>
+              <select class="search-box" id="scheduleTime" style="width: 100%;">
+                <option value="">Select time slot</option>
+                <option value="8:00 AM">8:00 AM</option>
+                <option value="9:00 AM">9:00 AM</option>
+                <option value="10:00 AM">10:00 AM</option>
+                <option value="11:00 AM">11:00 AM</option>
+                <option value="1:00 PM">1:00 PM</option>
+                <option value="2:00 PM">2:00 PM</option>
+                <option value="3:00 PM">3:00 PM</option>
+                <option value="4:00 PM">4:00 PM</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 25px;">
+              <label style="display: block; margin-bottom: 8px; color: var(--primary); font-weight: 500;">Notes (Optional)</label>
+              <textarea class="search-box" id="scheduleNotes" rows="3" style="width: 100%; resize: vertical;" placeholder="Add any notes for the patient..."></textarea>
+            </div>
+            <div style="display: flex; gap: 15px;">
+              <button class="btn btn-reject" style="flex: 1;" id="cancelScheduleBtn">
+                Cancel
+              </button>
+              <button class="btn btn-approve" style="flex: 1;" id="confirmScheduleBtn">
+                <i class="fas fa-check"></i> Confirm Schedule
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+   
+      <div class="modal" id="approvedAppointmentsModal">
+        <div class="modal-content large">
+          <header class="modal-header">
+            <h3 class="modal-title">
+              <i class="fas fa-calendar-check"></i> All Approved Appointments
+            </h3>
+            <button class="close-modal" id="closeApprovedModal">×</button>
+          </header>
+          <div class="modal-body" id="approvedAppointmentsContent">
+           
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+  </body>
+</html>
